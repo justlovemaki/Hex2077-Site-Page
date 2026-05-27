@@ -1,0 +1,99 @@
+name: Deploy Static Site to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: justlovemaki/Hex2077-Site
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with Next.js
+        run: pnpm run build
+        env:
+          IS_STATIC_EXPORT: "true"
+          NEXT_PUBLIC_IS_STATIC_EXPORT: "true"
+          NEXT_PUBLIC_ADDRESS: "Digital Space, Cyber Reality"
+          NEXT_PUBLIC_BLOG_IMAGE_UNOPTIMIZED: "false"
+          NEXT_PUBLIC_BLOG_SHOW_THUMBNAIL: "false"
+          NEXT_PUBLIC_COMPANY: "何夕2077个人站"
+          NEXT_PUBLIC_COMPANY_NAME: "何夕2077"
+          NEXT_PUBLIC_DPO_ADDRESS: "Digital Space, Cyber Reality"
+          NEXT_PUBLIC_DPO_EMAIL: "justlikemaki@foxmail.com"
+          NEXT_PUBLIC_ENABLE_ADBLOCK_WARNING: "false"
+          NEXT_PUBLIC_ENABLE_AI: "false"
+          NEXT_PUBLIC_ENABLE_AI_CHAT: "false"
+          NEXT_PUBLIC_ENABLE_AI_IMAGE: "false"
+          NEXT_PUBLIC_ENABLE_AI_VIDEO: "false"
+          NEXT_PUBLIC_ENABLE_BLOG: "true"
+          NEXT_PUBLIC_ENABLE_CREDITS: "false"
+          NEXT_PUBLIC_ENABLE_DATABASE: "false"
+          NEXT_PUBLIC_ENABLE_DOCS: "true"
+          NEXT_PUBLIC_ENABLE_GLOBAL_NOTIFICATION: "true"
+          NEXT_PUBLIC_ENABLE_LOGIN: "false"
+          NEXT_PUBLIC_ENABLE_SUBSCRIPTION: "false"
+          NEXT_PUBLIC_FLOATING_WIDGET_HEIGHT: "600px"
+          NEXT_PUBLIC_FLOATING_WIDGET_URL: "https://chat.hex2077.dev/"
+          NEXT_PUBLIC_FLOATING_WIDGET_WIDTH: "300px"
+          NEXT_PUBLIC_GISCUS_CATEGORY: "Announcements"
+          NEXT_PUBLIC_GISCUS_CATEGORY_ID: "DIC_kwDOO_2Ows4Cr2Q0"
+          NEXT_PUBLIC_GISCUS_REPO: "justlovemaki/Hextra-AI-Insight-Daily"
+          NEXT_PUBLIC_GISCUS_REPO_ID: "R_kgDOO_2Owg"
+          NEXT_PUBLIC_PHONE: "暂无联系电话"
+          NEXT_PUBLIC_PRIVACY_EMAIL: "justlikemaki@foxmail.com"
+          NEXT_PUBLIC_SITE_DESCRIPTION: "何夕2077的专注个人每日整理的AI资讯站。我们为您过滤全网信息噪音，只提供最精选的国内外AI新闻与大模型最新动态。除了挖掘最实用的AI办公效率工具推荐，还搭配零基础也能懂的AI落地应用实操教程。助您每天高效获取人工智能领域的前沿动态，洞悉全球人工智能最新发展趋势，快人一步打破科技信息差，轻松享受AI红利！"
+          NEXT_PUBLIC_SITE_KEYWORDS: "hex2077,何夕2077,个人网站,AI资讯,AI周报,博客,技术探索,赛博朋克,Next.js"
+          NEXT_PUBLIC_SITE_NAME: "何夕2077的个人站 | AI资讯 | 精选AI新闻与工具 | 洞悉AI前沿动态"
+          NEXT_PUBLIC_SITE_URL: "https://hex2077.dev"
+          NEXT_PUBLIC_SUPPORT_EMAIL: "justlikemaki@foxmail.com"
+          NEXT_PUBLIC_UMAMI_WEBSITE_ID: "90d81f10-1c6d-4ac1-9ea8-264d6b59aac9"
+          NEXT_PUBLIC_WEBSITE: "https://hex2077.dev"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
