@@ -42,8 +42,8 @@ jobs:
         run: pnpm run build
         env:
           NEXT_PUBLIC_BASE_PATH: ""
-          NEXT_PUBLIC_SITE_URL: "https://hex2077.dev"
-          NEXT_PUBLIC_WEBSITE: "https://hex2077.dev"
+          NEXT_PUBLIC_SITE_URL: "https://hex2077.dev/"
+          NEXT_PUBLIC_WEBSITE: "https://hex2077.dev/"
           IS_STATIC_EXPORT: "true"
           NEXT_PUBLIC_IS_STATIC_EXPORT: "true"
           NEXT_PUBLIC_ADDRESS: "Digital Space, Cyber Reality"
